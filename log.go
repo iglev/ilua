@@ -49,7 +49,7 @@ func (imp *stdLuaLogimp) write(level string, format string, args ...interface{})
 	filename, line, funcname := "???", 0, "???"
 	var ok bool
 	var pc uintptr
-	pc, filename, line, ok = runtime.Caller(2)
+	pc, filename, line, ok = runtime.Caller(3)
 	if ok {
 		funcname = runtime.FuncForPC(pc).Name()
 		funcname = filepath.Ext(funcname)
