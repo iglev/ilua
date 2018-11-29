@@ -1,0 +1,3 @@
+github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
+github.com/yuin/gopher-lua v0.0.0-20181109042959-a0dfe84f6227 h1:GRy+0tGtORsCA+CJUMfhLuN71eQ0LtsQRDBQKbzESdc=
+github.com/yuin/gopher-lua v0.0.0-20181109042959-a0dfe84f6227/go.mod h1:fFiAh+CowNFr0NK5VASokuwKwkbacRmHsVA7Yb1Tqac=
