@@ -6,15 +6,6 @@ import (
 	glua "github.com/yuin/gopher-lua"
 )
 
-const (
-	luaMainFileName = "G_MAIN_FILE"
-	luaMainModule   = "G_MAIN"
-	luaValLuaFiles  = "luafiles"
-	luaValDir       = "dir"
-	luaValFiles     = "files"
-	luaValDecode    = "decode"
-)
-
 var (
 	// ErrConfigScript config script error
 	ErrConfigScript = errors.New("configScript error")
@@ -33,40 +24,50 @@ var (
 )
 
 // LoadLibs load main
-func LoadLibs(L *glua.LState, configScript string) (err error) {
-	err = L.DoFile(configScript)
+func LoadLibs(L *LState, argsFile string) (err error) {
+	err = L.L().DoFile(argsFile)
 	if err != nil {
-		logerror("DoFile fail, configScript=%v err=%v", configScript, err)
+		logerror("DoFile fail, argsFile=%v err=%v", argsFile, err)
 		return
 	}
-	mainPath, mainOK := L.GetGlobal(luaMainFileName).(glua.LString)
-	if !mainOK {
-		logerror("not found mainfile=%v", luaMainFileName)
+	baseMainFile, bmOK := L.L().GetGlobal(LuaBaseMainFileName).(glua.LString)
+	if !bmOK {
+		logerror("not found basefile=%v", LuaBaseMainFileName)
 		err = ErrConfigScript
 		return
 	}
-	mainfile := string(mainPath)
-	loginfo("mainfile=%v", mainfile)
-	err = loadLuaFiles(L, mainfile)
+	err = loadLuaFiles(L.L(), string(baseMainFile), LuaBaseMainModule)
 	if err != nil {
-		logerror("loadLuaFiles fail, mainfile=%v err=%v", mainfile, err)
+		logerror("loadLuaFiles fail, basemainfile=%v err=%v", string(baseMainFile), err)
+		return
+	}
+
+	mainFile, mainOK := L.L().GetGlobal(LuaMainFileName).(glua.LString)
+	if !mainOK {
+		logerror("not found mainfile=%v", LuaMainFileName)
+		err = ErrConfigScript
+		return
+	}
+	err = loadLuaFiles(L.L(), string(mainFile), LuaMainModule)
+	if err != nil {
+		logerror("loadLuaFiles fail, mainfile=%v err=%v", string(mainFile), err)
 		return
 	}
 	return
 }
 
-func loadLuaFiles(L *glua.LState, mainfile string) (err error) {
+func loadLuaFiles(L *glua.LState, mainfile, modName string) (err error) {
 	err = L.DoFile(mainfile)
 	if err != nil {
 		logerror("do mainfile fail, mainfile=%v err=%v", mainfile, err)
 		return
 	}
-	mainMod, mainModOK := L.GetGlobal(luaMainModule).(*glua.LTable)
+	mainMod, mainModOK := L.GetGlobal(modName).(*glua.LTable)
 	if !mainModOK {
 		logerror("mainModule fail")
 		return ErrMainModuleNotFound
 	}
-	luafiles, luafilesOK := L.GetField(mainMod, luaValLuaFiles).(*glua.LTable)
+	luafiles, luafilesOK := L.GetField(mainMod, LuaValLuaFiles).(*glua.LTable)
 	if !luafilesOK {
 		logerror("luafiles fail")
 		return ErrLuaFilesNotFound
@@ -78,13 +79,13 @@ func loadLuaFiles(L *glua.LState, mainfile string) (err error) {
 			err = ErrSubModNotTable
 			return
 		}
-		dir, dirOK := L.GetField(submod, luaValDir).(glua.LString)
+		dir, dirOK := L.GetField(submod, LuaValDir).(glua.LString)
 		if !dirOK {
 			logerror("dir fail")
 			err = ErrSubModDirError
 			return
 		}
-		files, filesOK := L.GetField(submod, luaValFiles).(*glua.LTable)
+		files, filesOK := L.GetField(submod, LuaValFiles).(*glua.LTable)
 		if !filesOK {
 			logerror("files fail, dir=%v", string(dir))
 			err = ErrSubModFilesError

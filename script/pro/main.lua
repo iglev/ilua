@@ -2,13 +2,6 @@ module("G_MAIN", package.seeall)
 
 luafiles = {
     {
-        dir = G_SCRIPT_DIR .. "hotfix/",
-        files = {
-            "svc_hotfix.lua",
-        },
-        decode = "none",
-    },
-    {
         dir = G_SCRIPT_DIR .. "mo1/",
         files = {
             "svc_mo1.lua",
