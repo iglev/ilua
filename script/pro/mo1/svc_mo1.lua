@@ -16,6 +16,6 @@ local mp = {
     Num = 123,
     Str = "string",
 }
-LogInfo("----abcd-mp=%v", mp)
+LogInfo("----abcd--mp=%v", mp)
 
 

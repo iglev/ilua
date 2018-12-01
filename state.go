@@ -50,10 +50,10 @@ func NewState(opts ...Option) *LState {
 }
 
 func (L *LState) openlibs() {
-	// log
-	OpenLogLib(L.L(), LogLibName)
-	// file
-	export.OpenFileLib(L.L(), FileLibName)
+	// export log
+	export.OpenLogLib(L.L())
+	// export file
+	export.OpenFileLib(L.L())
 }
 
 ////////////////////////////////////////////////////////////

@@ -46,12 +46,3 @@ const (
 )
 
 ///////////////////////////////////////////////////////////////////
-
-// export module
-
-const (
-	// LogLibName log module name
-	LogLibName = "MLog"
-	// FileLibName file module name
-	FileLibName = "MFile"
-)

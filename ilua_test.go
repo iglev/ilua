@@ -3,6 +3,8 @@ package ilua
 import (
 	"testing"
 	"time"
+
+	"github.com/iglev/ilua/log"
 )
 
 // // TestRunning ...
@@ -18,8 +20,8 @@ import (
 // }
 
 // func TestLogger(t *testing.T) {
-// 	logerror("err=%v", 1234)
-// 	loginfo("info=%v", "abcd")
+// 	log.Error("err=%v", 1234)
+// 	log.Info("info=%v", "abcd")
 // }
 
 func TestLoadLibs(t *testing.T) {
@@ -27,7 +29,7 @@ func TestLoadLibs(t *testing.T) {
 	defer L.Close()
 	err := LoadLibs(L, "./script/args.lua")
 	if err != nil {
-		logerror("err=%v", err)
+		log.Error("err=%v", err)
 		return
 	}
 	timer := time.NewTimer(1 * time.Second)
@@ -43,11 +45,11 @@ Loop:
 			c--
 			err = L.CheckHotfix()
 			if err != nil {
-				logerror("err=%v", err)
+				log.Error("err=%v", err)
 				return
 			}
 			timer.Reset(1 * time.Second)
 		}
 	}
-	loginfo("LoadLibs success")
+	log.Info("LoadLibs success")
 }

@@ -6,25 +6,16 @@ import (
 	glua "github.com/yuin/gopher-lua"
 )
 
-var fileFuncs = map[string]glua.LGFunction{
-	"ModTime": exportFileGetModTime,
-}
+const (
+	// FileLibName file module name
+	FileLibName = "MFile"
+)
 
 // OpenFileLib export file lib
-func OpenFileLib(L *glua.LState, modName string) {
-	L.Push(L.NewFunction(exportFileLoader))
-	L.Push(glua.LString(modName))
-	L.Call(1, 0)
-}
-
-func exportFileLoader(L *glua.LState) int {
-	modName, ok := L.Get(-1).(glua.LString)
-	if !ok {
-		return 0
-	}
-	mod := L.RegisterModule(string(modName), fileFuncs).(*glua.LTable)
-	L.Push(mod)
-	return 1
+func OpenFileLib(L *glua.LState) {
+	OpenLib(L, FileLibName, map[string]glua.LGFunction{
+		"ModTime": exportFileGetModTime,
+	})
 }
 
 func exportFileGetModTime(L *glua.LState) int {
