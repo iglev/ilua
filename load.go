@@ -42,7 +42,6 @@ func LoadLibs(L *LState, argsFile string) (err error) {
 		log.Error("loadLuaFiles fail, basemainfile=%v err=%v", string(baseMainFile), err)
 		return
 	}
-
 	mainFile, mainOK := L.L().GetGlobal(LuaMainFileName).(glua.LString)
 	if !mainOK {
 		log.Error("not found mainfile=%v", LuaMainFileName)
@@ -105,6 +104,7 @@ func loadLuaFiles(L *glua.LState, mainfile, modName string) (err error) {
 				log.Error("DoFile fail, err=%v", err)
 				return
 			}
+			log.Info("load success %v", string(filename))
 		})
 	})
 	return
