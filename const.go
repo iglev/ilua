@@ -6,7 +6,7 @@ package ilua
 
 const (
 	// DefaultHotfix default hotfix time
-	DefaultHotfix = 10 // 10 second
+	DefaultHotfix = 1 // 10 // 10 second
 	// DefaultCallStackSize default call stack size
 	DefaultCallStackSize = 256
 	// DefaultRegistrySize default data stack size

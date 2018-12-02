@@ -22,9 +22,11 @@ local mp = {
 LogInfo("----abcd--mp=%v", mp)
 ]]
 
-LogInfo("no=%v", no)
-LogInfo("type=%v", type(no))
-LogInfo("no.Name=%v", no.Name)
-no:SetToken("luatoken")
-no.Name = "luaname"
+p = Person()
+p.Name = "Lily"
+p.Age = 3
+p:Print()
 
+function fun()
+    return 10
+end

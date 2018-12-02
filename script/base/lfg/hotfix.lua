@@ -29,6 +29,7 @@ function tryReload(fullpath)
             LogError("dofile fail file=%v err=%v", fullpath, err)
             return
         end
+        LogInfo("reload file=%v", fullpath)
     end
     DATAHotfix.LastTimeCache[fullpath] = modTime
 end

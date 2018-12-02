@@ -8,30 +8,20 @@ import (
 
 const (
 	// FileLibName file module name
-	FileLibName = "MFile"
+	FileLibName = "mfile"
 )
 
 // OpenFileLib export file lib
 func OpenFileLib(L *glua.LState) {
-	OpenLib(L, FileLibName, map[string]glua.LGFunction{
+	OpenLib(L, FileLibName, map[string]interface{}{
 		"ModTime": exportFileGetModTime,
 	})
 }
 
-func exportFileGetModTime(L *glua.LState) int {
-	path, ok := L.Get(-1).(glua.LString)
-	if !ok {
-		L.Push(glua.LNil)
-		L.Push(glua.LString("param error"))
-		return 2
-	}
-	stat, err := os.Stat(string(path))
+func exportFileGetModTime(path string) (glua.LNumber, glua.LValue) {
+	stat, err := os.Stat(path)
 	if err != nil {
-		L.Push(glua.LNil)
-		L.Push(glua.LString(err.Error()))
-		return 2
+		return 0, glua.LString(err.Error())
 	}
-	L.Push(glua.LNumber(stat.ModTime().Unix()))
-	L.Push(glua.LNil)
-	return 2
+	return glua.LNumber(stat.ModTime().Unix()), glua.LNil
 }

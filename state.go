@@ -17,14 +17,34 @@ func (L *LState) L() *glua.LState {
 	return L.gl
 }
 
+// Close close lua state
+func (L *LState) Close() {
+	L.gl.Close()
+}
+
+// RegMod register module
+func (L *LState) RegMod(modName string, args map[string]interface{}) {
+	export.OpenLib(L.L(), modName, args)
+}
+
+// RegType register golang type for lua
+func (L *LState) RegType(typename string, ins interface{}) {
+	export.NewType(L.L(), typename, ins)
+}
+
+// DoFiles do lua files
+func (L *LState) DoFiles(argsFile string) error {
+	return doFiles(L.L(), argsFile)
+}
+
 // CheckHotfix check hot fix
 func (L *LState) CheckHotfix() error {
 	return checkHotfix(L)
 }
 
-// Close close lua state
-func (L *LState) Close() {
-	L.gl.Close()
+// Call golang call lua function
+func (L *LState) Call(funcname string, args ...interface{}) (interface{}, error) {
+	return call(L, funcname, args)
 }
 
 // NewState new lua state

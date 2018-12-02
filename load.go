@@ -24,31 +24,31 @@ var (
 	ErrSubModFilenameError = errors.New("submodule filename error")
 )
 
-// LoadLibs load main
-func LoadLibs(L *LState, argsFile string) (err error) {
-	err = L.L().DoFile(argsFile)
+// doFiles load main
+func doFiles(L *glua.LState, argsFile string) (err error) {
+	err = L.DoFile(argsFile)
 	if err != nil {
 		log.Error("DoFile fail, argsFile=%v err=%v", argsFile, err)
 		return
 	}
-	baseMainFile, bmOK := L.L().GetGlobal(LuaBaseMainFileName).(glua.LString)
+	baseMainFile, bmOK := L.GetGlobal(LuaBaseMainFileName).(glua.LString)
 	if !bmOK {
 		log.Error("not found basefile=%v", LuaBaseMainFileName)
 		err = ErrConfigScript
 		return
 	}
-	err = loadLuaFiles(L.L(), string(baseMainFile), LuaBaseMainModule)
+	err = loadLuaFiles(L, string(baseMainFile), LuaBaseMainModule)
 	if err != nil {
 		log.Error("loadLuaFiles fail, basemainfile=%v err=%v", string(baseMainFile), err)
 		return
 	}
-	mainFile, mainOK := L.L().GetGlobal(LuaMainFileName).(glua.LString)
+	mainFile, mainOK := L.GetGlobal(LuaMainFileName).(glua.LString)
 	if !mainOK {
 		log.Error("not found mainfile=%v", LuaMainFileName)
 		err = ErrConfigScript
 		return
 	}
-	err = loadLuaFiles(L.L(), string(mainFile), LuaMainModule)
+	err = loadLuaFiles(L, string(mainFile), LuaMainModule)
 	if err != nil {
 		log.Error("loadLuaFiles fail, mainfile=%v err=%v", string(mainFile), err)
 		return

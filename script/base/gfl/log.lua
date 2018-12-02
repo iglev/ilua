@@ -2,14 +2,10 @@
 -- log, golang for lua
 
 function LogInfo(format, ...)
-    pargs = {...}
-    table.insert(pargs, #pargs)
-    MLog.Info("|lualog: " .. format, pargs)
+    mlog.Info("|lualog: " .. format, ...)
 end
 
 function LogError(format, ...)
-    pargs = {...}
-    table.insert(pargs, #pargs)
-    MLog.Error("|lualog: " .. format, pargs)
+    mlog.Error("|lualog: " .. format, ...)
 end
 
