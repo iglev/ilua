@@ -27,6 +27,15 @@ p.Name = "Lily"
 p.Age = 3
 p:Print()
 
+no = Node()
+no.Num = 1111
+p:PrintNode(no)
+
+p:PrintNode(p:GenNode(1234))
+
+mymod.func1()
+LogInfo("mymod.Num=%v mymod.StringVal=%v", mymod.Num, mymod.StringVal)
+
 function fun()
     return 10
 end

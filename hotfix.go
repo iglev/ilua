@@ -9,7 +9,7 @@ import (
 
 func checkHotfix(L *LState) (err error) {
 	curr := time.Now().Unix()
-	if curr >= (L.lastHotfixTime + L.opts.HotfixTime) {
+	if (L.opts.HotfixTime >= 0) && curr >= (L.lastHotfixTime+L.opts.HotfixTime) {
 		err = L.L().CallByParam(glua.P{
 			Fn:   L.L().GetGlobal(LuaFuncHotfix),
 			NRet: 0,
