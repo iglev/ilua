@@ -24,8 +24,8 @@ var (
 	ErrSubModFilenameError = errors.New("submodule filename error")
 )
 
-// doFiles load main
-func doFiles(L *glua.LState, argsFile string) (err error) {
+// doProFiles load main
+func doProFiles(L *glua.LState, argsFile string) (err error) {
 	err = L.DoFile(argsFile)
 	if err != nil {
 		log.Error("DoFile fail, argsFile=%v err=%v", argsFile, err)

@@ -43,6 +43,8 @@ const (
 const (
 	// LuaFuncHotfix lua func "LFGHotFix"
 	LuaFuncHotfix = "LFGHotFix"
+	// LuaFuncCall lua func "LFGCall"
+	LuaFuncCall = "LFGCall"
 )
 
 ///////////////////////////////////////////////////////////////////

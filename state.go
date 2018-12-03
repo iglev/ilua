@@ -12,6 +12,9 @@ type LState struct {
 	lastHotfixTime int64
 }
 
+// LStateMod lua state module type
+type LStateMod map[string]interface{}
+
 // L get glua state
 func (L *LState) L() *glua.LState {
 	return L.gl
@@ -32,9 +35,9 @@ func (L *LState) RegType(typename string, ins interface{}) {
 	export.NewType(L.L(), typename, ins)
 }
 
-// DoFiles do lua files
-func (L *LState) DoFiles(argsFile string) error {
-	return doFiles(L.L(), argsFile)
+// DoProFiles do lua files
+func (L *LState) DoProFiles(argsFile string) error {
+	return doProFiles(L.L(), argsFile)
 }
 
 // CheckHotfix check hot fix
@@ -43,8 +46,8 @@ func (L *LState) CheckHotfix() error {
 }
 
 // Call golang call lua function
-func (L *LState) Call(funcname string, args ...interface{}) (interface{}, error) {
-	return call(L, funcname, args)
+func (L *LState) Call(funcname string, args ...interface{}) (glua.LValue, error) {
+	return call(L.L(), funcname, args...)
 }
 
 // NewState new lua state
