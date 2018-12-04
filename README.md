@@ -10,11 +10,11 @@ base on github.com/yuin/gopher-lua.
 # script 目录
 <pre>
 base: 基础libs
-	- gfl: golang for lua (golang导出给lua相关接口)
-	- lfg: lua for golang (lua提供给golang的接口)
-	- basemain.lua:  描述base目录的lua文件集合
+	- gfl: golang for lua (golang导出给lua接口)
+	- lfg: lua for golang (lua提供给golang接口)
+	- basemain.lua:  描述base目录下lua文件集合
 pro: 逻辑模块
-	- main.lua: 描述pro目录的lua文件集合 (业务按照模块方式管理)
+	- main.lua: 描述pro目录下lua文件集合 (业务按照模块方式管理)
 args.lua: 入口参数,第一个加载lua文件(全局路径, 全局模块 和 path相关)
 </pre>
 
