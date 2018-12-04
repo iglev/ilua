@@ -26,7 +26,7 @@ func (L *LState) Close() {
 }
 
 // RegMod register module
-func (L *LState) RegMod(modName string, args map[string]interface{}) {
+func (L *LState) RegMod(modName string, args LStateMod) {
 	export.OpenLib(L.L(), modName, args)
 }
 
@@ -48,6 +48,22 @@ func (L *LState) CheckHotfix() error {
 // Call golang call lua function
 func (L *LState) Call(funcname string, args ...interface{}) (glua.LValue, error) {
 	return call(L.L(), funcname, args...)
+}
+
+// UnmarshalLTB unmarshal lua table to golang struct
+func (L *LState) UnmarshalLTB(script string, val interface{}) (interface{}, error) {
+	return unmarshalLTB(L.L(), script, val)
+}
+
+// UnmarshalLTB unmarshal lua table to golang struct
+func UnmarshalLTB(script string, val interface{}) (interface{}, error) {
+	gluaOpts := glua.Options{
+		CallStackSize: 64,
+		RegistrySize:  64,
+	}
+	L := glua.NewState(gluaOpts)
+	defer L.Close()
+	return unmarshalLTB(L, script, val)
 }
 
 // NewState new lua state

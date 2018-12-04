@@ -1,9 +1,13 @@
 return {
     -- fields
-    name = "testname",
-    degree = true,
-    log_level = 3,
-    sub = { -- sub table
-        n = "nstr"
+    Name = "testname",
+    Degree = true,
+    LogLevel = 3,
+    Sub = { -- sub table
+        N = "nstr",
+        XY = {
+            X = 1,
+            Y = 2,
+        },
     },
 }
