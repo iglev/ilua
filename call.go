@@ -31,10 +31,10 @@ func call(L *glua.LState, funcname string, args ...interface{}) (glua.LValue, er
 		return nil, err
 	}
 	restb, ok := L.Get(-1).(*glua.LTable)
-	defer L.Pop(1)
 	if !ok {
 		return nil, fmt.Errorf("Call lua `func=LFGCall` must return {r=xxx, err=xxx}")
 	}
+	L.Pop(1)
 	errStr, errOK := restb.RawGetString("err").(glua.LString)
 	if errOK {
 		return nil, errors.New(string(errStr))
