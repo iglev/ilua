@@ -1,12 +1,6 @@
 package ilua
 
-import (
-	"time"
-
-	"github.com/iglev/ilua/log"
-	glua "github.com/yuin/gopher-lua"
-)
-
+/*
 func checkHotfix(L *LState) (err error) {
 	curr := time.Now().Unix()
 	if (L.opts.HotfixTime >= 0) && curr >= (L.lastHotfixTime+L.opts.HotfixTime) {
@@ -22,3 +16,4 @@ func checkHotfix(L *LState) (err error) {
 	}
 	return nil
 }
+*/

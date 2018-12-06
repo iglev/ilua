@@ -35,6 +35,7 @@ func TestRegType(t *testing.T) {
 		log.Error("err=%v", err)
 		return
 	}
+
 }
 
 func createPerson(name string, age int) *Person {

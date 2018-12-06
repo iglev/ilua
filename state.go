@@ -40,10 +40,12 @@ func (L *LState) DoProFiles(argsFile string) error {
 	return doProFiles(L.L(), argsFile)
 }
 
+/*
 // CheckHotfix check hot fix
 func (L *LState) CheckHotfix() error {
 	return checkHotfix(L)
 }
+*/
 
 // Call golang call lua function
 func (L *LState) Call(funcname string, args ...interface{}) (glua.LValue, error) {

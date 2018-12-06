@@ -46,12 +46,23 @@ func rawOut(value glua.LValue) interface{} {
 	switch value.(type) {
 	case *glua.LTable:
 		tb := value.(*glua.LTable)
-		o := make([]interface{}, 0, 16)
-		tb.ForEach(func(k, v glua.LValue) {
-			o = append(o, rawOut(v))
-		})
-		return o
+		return rawOutLTable(tb)
+	case *glua.LUserData:
+		ud := value.(*glua.LUserData)
+		return rawOUtLUserData(ud)
 	default:
 		return value
 	}
+}
+
+func rawOutLTable(tb *glua.LTable) interface{} {
+	o := make([]interface{}, 0, 16)
+	tb.ForEach(func(k, v glua.LValue) {
+		o = append(o, rawOut(v))
+	})
+	return o
+}
+
+func rawOUtLUserData(ud *glua.LUserData) interface{} {
+	return ud.Value
 }
