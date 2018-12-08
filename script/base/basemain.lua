@@ -12,7 +12,6 @@ luafiles = {
     {
         dir = G_BASE_DIR .. "lfg/",
         files = {
-            "hotfix.lua",
             "call.lua",
         },
         decode = "none",

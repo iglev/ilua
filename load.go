@@ -25,13 +25,13 @@ var (
 )
 
 // doProFiles load main
-func doProFiles(L *glua.LState, argsFile string) (err error) {
-	err = L.DoFile(argsFile)
+func doProFiles(L *LState, argsFile string) (err error) {
+	err = L.L().DoFile(argsFile)
 	if err != nil {
 		log.Error("DoFile fail, argsFile=%v err=%v", argsFile, err)
 		return
 	}
-	baseMainFile, bmOK := L.GetGlobal(LuaBaseMainFileName).(glua.LString)
+	baseMainFile, bmOK := L.L().GetGlobal(LuaBaseMainFileName).(glua.LString)
 	if !bmOK {
 		log.Error("not found basefile=%v", LuaBaseMainFileName)
 		err = ErrConfigScript
@@ -42,7 +42,7 @@ func doProFiles(L *glua.LState, argsFile string) (err error) {
 		log.Error("loadLuaFiles fail, basemainfile=%v err=%v", string(baseMainFile), err)
 		return
 	}
-	mainFile, mainOK := L.GetGlobal(LuaMainFileName).(glua.LString)
+	mainFile, mainOK := L.L().GetGlobal(LuaMainFileName).(glua.LString)
 	if !mainOK {
 		log.Error("not found mainfile=%v", LuaMainFileName)
 		err = ErrConfigScript
@@ -56,42 +56,42 @@ func doProFiles(L *glua.LState, argsFile string) (err error) {
 	return
 }
 
-func loadLuaFiles(L *glua.LState, mainfile, modName string) (err error) {
-	err = L.DoFile(mainfile)
+func loadLuaFiles(L *LState, mainfile, modName string) (err error) {
+	err = L.L().DoFile(mainfile)
 	if err != nil {
 		log.Error("do mainfile fail, mainfile=%v err=%v", mainfile, err)
 		return
 	}
-	mainMod, mainModOK := L.GetGlobal(modName).(*glua.LTable)
+	mainMod, mainModOK := L.L().GetGlobal(modName).(*glua.LTable)
 	if !mainModOK {
 		log.Error("mainModule fail")
 		return ErrMainModuleNotFound
 	}
-	luafiles, luafilesOK := L.GetField(mainMod, LuaValLuaFiles).(*glua.LTable)
+	luafiles, luafilesOK := L.L().GetField(mainMod, LuaValLuaFiles).(*glua.LTable)
 	if !luafilesOK {
 		log.Error("luafiles fail")
 		return ErrLuaFilesNotFound
 	}
-	L.ForEach(luafiles, func(key glua.LValue, val glua.LValue) {
+	L.L().ForEach(luafiles, func(key glua.LValue, val glua.LValue) {
 		submod, submodOK := val.(*glua.LTable)
 		if !submodOK {
 			log.Error("submod fail")
 			err = ErrSubModNotTable
 			return
 		}
-		dir, dirOK := L.GetField(submod, LuaValDir).(glua.LString)
+		dir, dirOK := L.L().GetField(submod, LuaValDir).(glua.LString)
 		if !dirOK {
 			log.Error("dir fail")
 			err = ErrSubModDirError
 			return
 		}
-		files, filesOK := L.GetField(submod, LuaValFiles).(*glua.LTable)
+		files, filesOK := L.L().GetField(submod, LuaValFiles).(*glua.LTable)
 		if !filesOK {
 			log.Error("files fail, dir=%v", string(dir))
 			err = ErrSubModFilesError
 			return
 		}
-		L.ForEach(files, func(fkey glua.LValue, fval glua.LValue) {
+		L.L().ForEach(files, func(fkey glua.LValue, fval glua.LValue) {
 			filename, filenameOK := fval.(glua.LString)
 			if !filenameOK {
 				log.Error("filename fail, dir=%v val=%v", dir, val)
@@ -99,11 +99,12 @@ func loadLuaFiles(L *glua.LState, mainfile, modName string) (err error) {
 				return
 			}
 			fullname := string(dir) + string(filename)
-			err = L.DoFile(fullname)
+			err = L.L().DoFile(fullname)
 			if err != nil {
 				log.Error("DoFile fail, err=%v", err)
 				return
 			}
+			L.RegHotfix(fullname)
 			log.Info("load success %v", string(filename))
 		})
 	})

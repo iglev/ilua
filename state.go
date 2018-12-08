@@ -1,14 +1,20 @@
 package ilua
 
 import (
+	"context"
+
 	"github.com/iglev/ilua/export"
+	"github.com/iglev/ilua/log"
 	glua "github.com/yuin/gopher-lua"
 )
 
 // LState lua state interface
 type LState struct {
+	ctx            context.Context
+	cancelFunc     context.CancelFunc
 	gl             *glua.LState
 	opts           *Options
+	hfMgr          hotfixMgr
 	lastHotfixTime int64
 }
 
@@ -22,6 +28,7 @@ func (L *LState) L() *glua.LState {
 
 // Close close lua state
 func (L *LState) Close() {
+	L.cancelFunc()
 	L.gl.Close()
 }
 
@@ -37,18 +44,21 @@ func (L *LState) RegType(typename string, ins interface{}) {
 
 // DoProFiles do lua files
 func (L *LState) DoProFiles(argsFile string) error {
-	return doProFiles(L.L(), argsFile)
+	return doProFiles(L, argsFile)
 }
 
-/*
-// CheckHotfix check hot fix
-func (L *LState) CheckHotfix() error {
-	return checkHotfix(L)
+// RegHotfix lua file register hotfix
+func (L *LState) RegHotfix(file string) {
+	if L.hfMgr != nil {
+		L.hfMgr.reg(file)
+	}
 }
-*/
 
 // Call golang call lua function
 func (L *LState) Call(funcname string, args ...interface{}) (glua.LValue, error) {
+	if L.hfMgr != nil {
+		L.hfMgr.check(L)
+	}
 	return call(L.L(), funcname, args...)
 }
 
@@ -78,15 +88,28 @@ func NewState(opts ...Option) *LState {
 	for _, option := range opts {
 		option.f(do)
 	}
+	return NewStateWithOpts(do)
+}
+
+// NewStateWithOpts new lua state with options
+func NewStateWithOpts(do *Options) *LState {
 	gluaOpts := glua.Options{
 		CallStackSize: do.CallStackSize,
 		RegistrySize:  do.RegistrySize,
 	}
+	ctx, cancel := context.WithCancel(context.Background())
 	L := &LState{
-		gl:   glua.NewState(gluaOpts),
-		opts: do,
+		ctx:        ctx,
+		cancelFunc: cancel,
+		gl:         glua.NewState(gluaOpts),
+		opts:       do,
 	}
 	L.openlibs()
+	// hotfix
+	if L.opts.NeedHotfix {
+		log.Info("newHotfixMgr-----------------")
+		L.hfMgr = newHotfixMgr(ctx, L.opts.NeedHotfixCoro)
+	}
 	return L
 }
 
@@ -101,9 +124,12 @@ func (L *LState) openlibs() {
 
 // Options ilua options
 type Options struct {
-	HotfixTime    int64 // -1: no need hotfix, >=0: time for check
-	CallStackSize int   // Call stack size
-	RegistrySize  int   // Data stack size
+	HotfixTime     int64 // -1: no need hotfix, >=0: time for check
+	CallStackSize  int   // Call stack size
+	RegistrySize   int   // Data stack size
+	GoCoroutine    bool  // need coroutine
+	NeedHotfix     bool  // need hotfix
+	NeedHotfixCoro bool  // need hotfix with coroutine
 }
 
 // Option ilua option
@@ -129,5 +155,13 @@ func SetCallStackSize(size int) Option {
 func SetRegistrySize(size int) Option {
 	return Option{func(do *Options) {
 		do.RegistrySize = size
+	}}
+}
+
+// SetHotfix set hotfix
+func SetHotfix(needHotfix bool, needHotfixCoro bool) Option {
+	return Option{func(do *Options) {
+		do.NeedHotfix = needHotfix
+		do.NeedHotfixCoro = needHotfixCoro
 	}}
 }

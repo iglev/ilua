@@ -2,6 +2,7 @@ package ilua
 
 import (
 	"testing"
+	"time"
 
 	"github.com/iglev/ilua/log"
 	glua "github.com/yuin/gopher-lua"
@@ -35,7 +36,6 @@ func TestRegType(t *testing.T) {
 		log.Error("err=%v", err)
 		return
 	}
-
 }
 
 func createPerson(name string, age int) *Person {
@@ -90,4 +90,46 @@ func TestLTB(t *testing.T) {
 	// res, _ := L.UnmarshalLTB("./script/conf.lua", ltb{})
 	res, _ := UnmarshalLTB("./script/conf.lua", ltb{})
 	log.Info("res=%+v", res)
+}
+
+func TestHotfix(t *testing.T) {
+	L := NewState(SetHotfix(true, false))
+	defer L.Close()
+	doErr := L.DoProFiles("./script/args.lua")
+	if doErr != nil {
+		log.Error("err=%v", doErr)
+		return
+	}
+	count := 0
+	L.RegMod("mymod", LStateMod{
+		"func1": func() {
+			count++
+			// log.Info("call mymod.func1")
+		},
+	})
+	/*
+		timer := time.NewTimer(1 * time.Second)
+		for {
+			select {
+			case <-timer.C:
+				func() {
+					_, err := L.Call("mymod.func1")
+					if err != nil {
+						log.Error("err=%v", err)
+						return
+					}
+				}()
+				timer.Reset(1 * time.Second)
+			}
+		}
+	*/
+	curr := time.Now()
+	for i := 0; i < 1000000; i++ {
+		_, err := L.Call("mymod.func1")
+		if err != nil {
+			log.Error("err=%v", err)
+			return
+		}
+	}
+	log.Info("cost=%v", time.Since(curr))
 }
