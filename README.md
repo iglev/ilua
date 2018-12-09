@@ -113,9 +113,9 @@ func TestLTB(t *testing.T) {
 
 # 启动热更新
 <pre>
-	// 默认不开启热更新, L.Call方法触发热更新
-	// 设置热更新，并且用协程方式检查文件
-	L := NewState(SetHotfix(true))
-	// 设置热更新，非协程方式检查文件
-	L := NewState(SetHotfix(false))
+// 默认不开启热更新, L.Call方法触发热更新
+// 设置热更新，并且用协程方式检查文件
+L := NewState(SetHotfix(true))
+// 设置热更新，非协程方式检查文件
+L := NewState(SetHotfix(false))
 </pre>
