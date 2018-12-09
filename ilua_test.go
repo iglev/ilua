@@ -92,37 +92,25 @@ func TestLTB(t *testing.T) {
 	log.Info("res=%+v", res)
 }
 
+var (
+	count = 10
+)
+
+func mfunc() {
+	count++
+}
+
 func TestHotfix(t *testing.T) {
-	L := NewState(SetHotfix(true, false))
+	L := NewState(SetHotfix(true, true))
 	defer L.Close()
 	doErr := L.DoProFiles("./script/args.lua")
 	if doErr != nil {
 		log.Error("err=%v", doErr)
 		return
 	}
-	count := 0
 	L.RegMod("mymod", LStateMod{
-		"func1": func() {
-			count++
-			// log.Info("call mymod.func1")
-		},
+		"func1": mfunc,
 	})
-	/*
-		timer := time.NewTimer(1 * time.Second)
-		for {
-			select {
-			case <-timer.C:
-				func() {
-					_, err := L.Call("mymod.func1")
-					if err != nil {
-						log.Error("err=%v", err)
-						return
-					}
-				}()
-				timer.Reset(1 * time.Second)
-			}
-		}
-	*/
 	curr := time.Now()
 	for i := 0; i < 1000000; i++ {
 		_, err := L.Call("mymod.func1")

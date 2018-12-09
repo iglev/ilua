@@ -6,7 +6,7 @@ package ilua
 
 const (
 	// DefaultHotfix default hotfix time
-	DefaultHotfix = 5 // 10 // 10 second
+	DefaultHotfix = 10 // 10 second
 	// DefaultCallStackSize default call stack size
 	DefaultCallStackSize = 256
 	// DefaultRegistrySize default data stack size
@@ -34,17 +34,6 @@ const (
 	LuaValFiles = "files"
 	// LuaValDecode var decode
 	LuaValDecode = "decode"
-)
-
-///////////////////////////////////////////////////////////////////
-
-// lua for golang global function
-
-const (
-	// LuaFuncHotfix lua func "LFGHotFix"
-	LuaFuncHotfix = "LFGHotFix"
-	// LuaFuncCall lua func "LFGCall"
-	LuaFuncCall = "LFGCall"
 )
 
 ///////////////////////////////////////////////////////////////////

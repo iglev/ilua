@@ -5,14 +5,12 @@ luafiles = {
         dir = G_BASE_DIR .. "gfl/",
         files = {
             "log.lua",
-            "file.lua",
         },
         decode = "none",
     },
     {
         dir = G_BASE_DIR .. "lfg/",
         files = {
-            "call.lua",
         },
         decode = "none",
     },

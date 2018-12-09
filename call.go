@@ -1,46 +1,12 @@
 package ilua
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/iglev/ilua/luar"
 	glua "github.com/yuin/gopher-lua"
 )
-
-func call(L *glua.LState, funcname string, args ...interface{}) (glua.LValue, error) {
-	functb := L.NewTable()
-	sp := strings.Split(funcname, ".")
-	size := len(sp)
-	if size == 1 {
-		functb.RawSetString("f", glua.LString(sp[0]))
-	} else if size == 2 {
-		functb.RawSetString("m", glua.LString(sp[0]))
-		functb.RawSetString("f", glua.LString(sp[1]))
-	} else {
-		return nil, fmt.Errorf("invalid funcname=%v", funcname)
-	}
-	largs := newArgs(L, []glua.LValue{functb}, args...)
-	err := L.CallByParam(glua.P{
-		Fn:      L.GetGlobal(LuaFuncCall),
-		NRet:    1,
-		Protect: true,
-	}, largs...)
-	if err != nil {
-		return nil, err
-	}
-	restb, ok := L.Get(-1).(*glua.LTable)
-	if !ok {
-		return nil, fmt.Errorf("Call lua `func=LFGCall` must return {r=xxx, err=xxx}")
-	}
-	L.Pop(1)
-	errStr, errOK := restb.RawGetString("err").(glua.LString)
-	if errOK {
-		return nil, errors.New(string(errStr))
-	}
-	return restb.RawGetString("r"), nil
-}
 
 func newArgs(L *glua.LState, preargs []glua.LValue, args ...interface{}) []glua.LValue {
 	presize := len(preargs)
@@ -54,4 +20,40 @@ func newArgs(L *glua.LState, preargs []glua.LValue, args ...interface{}) []glua.
 		res = append(res, luar.New(L, args[i]))
 	}
 	return res
+}
+
+func call(L *glua.LState, funcname string, args ...interface{}) (glua.LValue, error) {
+	sp := strings.Split(funcname, ".")
+	size := len(sp)
+	var funcval glua.LValue
+	if size == 1 {
+		if fv := L.GetGlobal(sp[0]); fv != glua.LNil {
+			funcval = fv
+		}
+	} else if size == 2 {
+		mod, ok := L.GetGlobal(sp[0]).(*glua.LTable)
+		if !ok {
+			return nil, fmt.Errorf("module name invalid, name=%v", funcname)
+		}
+		if fv := mod.RawGetString(sp[1]); fv != glua.LNil {
+			funcval = fv
+		}
+	} else {
+		return nil, fmt.Errorf("function name invalid, name=%v", funcname)
+	}
+	if funcval == nil {
+		return nil, fmt.Errorf("not found func, name=%v", funcname)
+	}
+	largs := newArgs(L, nil, args...)
+	err := L.CallByParam(glua.P{
+		Fn:      funcval,
+		NRet:    1,
+		Protect: true,
+	}, largs...)
+	if err != nil {
+		return nil, err
+	}
+	res := L.Get(-1)
+	L.Pop(1)
+	return res, nil
 }

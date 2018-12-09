@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/iglev/ilua/export"
-	"github.com/iglev/ilua/log"
 	glua "github.com/yuin/gopher-lua"
 )
 
@@ -107,7 +106,6 @@ func NewStateWithOpts(do *Options) *LState {
 	L.openlibs()
 	// hotfix
 	if L.opts.NeedHotfix {
-		log.Info("newHotfixMgr-----------------")
 		L.hfMgr = newHotfixMgr(ctx, L.opts.NeedHotfixCoro)
 	}
 	return L
@@ -116,8 +114,6 @@ func NewStateWithOpts(do *Options) *LState {
 func (L *LState) openlibs() {
 	// export log
 	export.OpenLogLib(L.L())
-	// export file
-	export.OpenFileLib(L.L())
 }
 
 ////////////////////////////////////////////////////////////

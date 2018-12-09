@@ -10,7 +10,7 @@ import (
 
 type hotfixMgr interface {
 	reg(file string)
-	check(L *LState)
+	check(L *LState) *hotfixList
 }
 
 func newHotfixMgr(ctx context.Context, needCoro bool) hotfixMgr {
@@ -63,15 +63,17 @@ func (ht *hotfixMgrLocal) reg(file string) {
 	ht.mp[file] = mt
 }
 
-func (ht *hotfixMgrLocal) check(L *LState) {
+func (ht *hotfixMgrLocal) check(L *LState) *hotfixList {
 	curr := time.Now().Unix()
 	if curr < (ht.lasttime + DefaultHotfix) {
-		return
+		return nil
 	}
+	ht.lasttime = curr
 	up := ht.getHotfixList()
 	if up != nil {
 		hotfixDoFile(L, ht, up)
 	}
+	return up
 }
 
 func (ht *hotfixMgrLocal) getHotfixList() *hotfixList {
@@ -117,11 +119,12 @@ func (ht *hotfixMgrCoro) reg(file string) {
 	ht.mp.Store(file, mt)
 }
 
-func (ht *hotfixMgrCoro) check(L *LState) {
+func (ht *hotfixMgrCoro) check(L *LState) *hotfixList {
 	up := ht.getHotfixList()
 	if up != nil {
 		hotfixDoFile(L, ht, up)
 	}
+	return up
 }
 
 func (ht *hotfixMgrCoro) getHotfixList() *hotfixList {
@@ -140,7 +143,6 @@ Loop:
 	for {
 		select {
 		case <-timer.C:
-			log.Info("loop----------------")
 			ht.loopCheck()
 			timer.Reset(DefaultHotfix * time.Second)
 		case <-ht.ctx.Done():
@@ -180,7 +182,6 @@ func (ht *hotfixMgrCoro) loopCheck() {
 			ht.mp.Store(k, v)
 			up.files = append(up.files, k)
 		}
-		log.Info("up------------%v", up)
 		select {
 		case ht.ch <- up:
 			return
