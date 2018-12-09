@@ -155,9 +155,9 @@ func SetRegistrySize(size int) Option {
 }
 
 // SetHotfix set hotfix
-func SetHotfix(needHotfix bool, needHotfixCoro bool) Option {
+func SetHotfix(needHotfixCoro bool) Option {
 	return Option{func(do *Options) {
-		do.NeedHotfix = needHotfix
+		do.NeedHotfix = true
 		do.NeedHotfixCoro = needHotfixCoro
 	}}
 }

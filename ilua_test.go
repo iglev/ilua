@@ -101,7 +101,7 @@ func mfunc() {
 }
 
 func TestHotfix(t *testing.T) {
-	L := NewState(SetHotfix(true, true))
+	L := NewState(SetHotfix(true))
 	defer L.Close()
 	doErr := L.DoProFiles("./script/args.lua")
 	if doErr != nil {
