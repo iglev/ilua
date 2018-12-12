@@ -1,10 +1,13 @@
 package ilua
 
 import (
+	// "encoding/json"
+	"os"
 	"testing"
 	"time"
 
 	"github.com/iglev/ilua/log"
+	json "github.com/json-iterator/go"
 	glua "github.com/yuin/gopher-lua"
 )
 
@@ -68,28 +71,64 @@ func TestCallFunc(t *testing.T) {
 }
 
 type ltb struct {
-	Name     string
-	Degree   bool
-	LogLevel int
-	Sub      subltb
-	Va       int
+	Name     string `json:"name"`
+	Degree   bool   `json:"degree"`
+	LogLevel int    `json:"log_level"`
+	Sub      subltb `json:"sub"`
 }
 
 type subltb struct {
-	N  string
-	XY subltb2
+	N  string  `json:"n"`
+	XY subltb2 `json:"xy"`
 }
 
 type subltb2 struct {
-	X, Y int64
+	X int64 `json:"x"`
+	Y int64 `json:"y"`
+}
+
+func ltbload(L *LState) {
+	// res, _ := L.UnmarshalLTB("./script/conf.lua", ltb{})
+	// log.Info("res=%v", res)
+	L.UnmarshalLTB("./script/conf.lua", ltb{})
 }
 
 func TestLTB(t *testing.T) {
 	L := NewState()
 	defer L.Close()
 	// res, _ := L.UnmarshalLTB("./script/conf.lua", ltb{})
-	res, _ := UnmarshalLTB("./script/conf.lua", ltb{})
-	log.Info("res=%+v", res)
+	// res, _ := UnmarshalLTB("./script/conf.lua", ltb{})
+	// log.Info("res=%v", res)
+	now := time.Now()
+	for i := 0; i < 10000; i++ {
+		ltbload(L)
+	}
+	log.Info("ltb--------------------------cost=%v", time.Since(now))
+}
+
+func jsonload() {
+	var one ltb
+	file, err := os.Open("./script/conf.json")
+	if err != nil {
+		log.Error("not found file err=%v", err)
+		return
+	}
+	defer file.Close()
+	jsonparser := json.NewDecoder(file)
+	err = jsonparser.Decode(&one)
+	if err != nil {
+		log.Error("decode err=%v", err)
+		return
+	}
+	// log.Info("one=%v", one)
+}
+
+func TestJSON(t *testing.T) {
+	now := time.Now()
+	for i := 0; i < 10000; i++ {
+		jsonload()
+	}
+	log.Info("json-------------------------cost=%v", time.Since(now))
 }
 
 var (
@@ -112,7 +151,8 @@ func TestHotfix(t *testing.T) {
 		"func1": mfunc,
 	})
 	curr := time.Now()
-	for i := 0; i < 1000000; i++ {
+	// for i := 0; i < 1000000; i++ {
+	for i := 0; i < 10; i++ {
 		_, err := L.Call("mymod.func1")
 		if err != nil {
 			log.Error("err=%v", err)

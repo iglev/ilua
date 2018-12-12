@@ -1,0 +1,12 @@
+{
+    "name":"testname",
+    "degree":true,
+    "log_level":3,
+    "sub":{
+        "n":"nstr",
+        "xy":{
+            "x":1,
+            "y":2
+        }
+    }
+}
