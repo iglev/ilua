@@ -15,6 +15,7 @@ type LState struct {
 	opts           *Options
 	hfMgr          hotfixMgr
 	lastHotfixTime int64
+	pool           *LStatePool
 }
 
 // LStateMod lua state module type
@@ -27,8 +28,22 @@ func (L *LState) L() *glua.LState {
 
 // Close close lua state
 func (L *LState) Close() {
-	L.cancelFunc()
-	L.gl.Close()
+	if L.pool == nil {
+		L.cancelFunc()
+		L.gl.Close()
+	} else {
+		L.pool.pushback(L)
+	}
+}
+
+func (L *LState) detachPool() {
+	if L.pool != nil {
+		L.pool = nil
+	}
+}
+
+func (L *LState) linkPool(pool *LStatePool) {
+	L.pool = pool
 }
 
 // RegMod register module
@@ -44,6 +59,16 @@ func (L *LState) RegType(typename string, ins interface{}) {
 // DoProFiles do lua files
 func (L *LState) DoProFiles(argsFile string) error {
 	return doProFiles(L, argsFile)
+}
+
+// DoFile do lua file
+func (L *LState) DoFile(script string) error {
+	return doFile(L, script)
+}
+
+// DoString do string
+func (L *LState) DoString(luastr string) error {
+	return doString(L, luastr)
 }
 
 // RegHotfix lua file register hotfix

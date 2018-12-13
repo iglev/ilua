@@ -110,3 +110,11 @@ func loadLuaFiles(L *LState, mainfile, modName string) (err error) {
 	})
 	return
 }
+
+func doFile(L *LState, script string) (err error) {
+	return L.L().DoFile(script)
+}
+
+func doString(L *LState, luastr string) (err error) {
+	return L.L().DoString(luastr)
+}

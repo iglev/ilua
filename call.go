@@ -1,6 +1,7 @@
 package ilua
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -47,13 +48,20 @@ func call(L *glua.LState, funcname string, args ...interface{}) (glua.LValue, er
 	largs := newArgs(L, nil, args...)
 	err := L.CallByParam(glua.P{
 		Fn:      funcval,
-		NRet:    1,
+		NRet:    2,
 		Protect: true,
 	}, largs...)
 	if err != nil {
 		return nil, err
 	}
-	res := L.Get(-1)
-	L.Pop(1)
+	res := L.Get(-2)
+	resErr := L.Get(-1)
+	defer L.Pop(2)
+	switch resErr.(type) {
+	case glua.LString:
+		return nil, errors.New(string(resErr.(glua.LString)))
+	case *glua.LUserData:
+		return nil, fmt.Errorf("%v", (resErr.(*glua.LUserData)).Value)
+	}
 	return res, nil
 }
