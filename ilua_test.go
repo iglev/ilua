@@ -5,9 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gomodule/redigo/redis"
-	"github.com/iglev/ilua/export"
-	"github.com/iglev/ilua/log"
+	log "github.com/iglev/ilog"
 	glua "github.com/yuin/gopher-lua"
 )
 
@@ -123,25 +121,27 @@ var (
 )
 
 func TestRedis(t *testing.T) {
-	L := NewState()
-	defer L.Close()
-	export.OpenRedisLib(L.L())
-	err := L.DoString(redisfunc)
-	if err != nil {
-		log.Error("err=%v", err)
-		return
-	}
-	client, cerr := redis.Dial("tcp", "127.0.0.1:6379")
-	if cerr != nil {
-		log.Error("cerr=%v", cerr)
-	}
-	defer client.Close()
-	res, resErr := L.Call("redisFunc", client)
-	if resErr != nil {
-		log.Error("err=%v", resErr)
-		return
-	}
-	log.Info("res=%v", res)
+	/*
+		L := NewState()
+		defer L.Close()
+		export.OpenRedisLib(L.L())
+		err := L.DoString(redisfunc)
+		if err != nil {
+			log.Error("err=%v", err)
+			return
+		}
+		client, cerr := redis.Dial("tcp", "127.0.0.1:6379")
+		if cerr != nil {
+			log.Error("cerr=%v", cerr)
+		}
+		defer client.Close()
+		res, resErr := L.Call("redisFunc", client)
+		if resErr != nil {
+			log.Error("err=%v", resErr)
+			return
+		}
+		log.Info("res=%v", res)
+	*/
 }
 
 func TestPool(t *testing.T) {
@@ -171,4 +171,8 @@ func TestPool(t *testing.T) {
 	time.Sleep(time.Second)
 	pool.Close()
 	log.Info("success, cnt=%v", count)
+}
+
+func TestLog(t *testing.T) {
+	log.Info("1111111")
 }

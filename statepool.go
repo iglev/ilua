@@ -4,7 +4,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/iglev/ilua/log"
+	log "github.com/iglev/ilog"
 )
 
 // LStatePool lua state pool

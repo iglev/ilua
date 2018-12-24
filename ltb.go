@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"strings"
 
+	log "github.com/iglev/ilog"
 	"github.com/iglev/ilua/export"
-	"github.com/iglev/ilua/log"
 	glua "github.com/yuin/gopher-lua"
 )
 

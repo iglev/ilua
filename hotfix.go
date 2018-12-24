@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/iglev/ilua/log"
+	log "github.com/iglev/ilog"
 )
 
 type hotfixMgr interface {

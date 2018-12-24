@@ -3,7 +3,7 @@ package ilua
 import (
 	"os"
 
-	"github.com/iglev/ilua/log"
+	log "github.com/iglev/ilog"
 )
 
 func getFileModtime(file string) (int64, error) {

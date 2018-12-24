@@ -1,7 +1,7 @@
 package export
 
 import (
-	"github.com/iglev/ilua/log"
+	log "github.com/iglev/ilog"
 	"github.com/iglev/ilua/luar"
 	glua "github.com/yuin/gopher-lua"
 )

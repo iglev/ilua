@@ -3,7 +3,7 @@ package ilua
 import (
 	"errors"
 
-	"github.com/iglev/ilua/log"
+	log "github.com/iglev/ilog"
 	glua "github.com/yuin/gopher-lua"
 )
 
