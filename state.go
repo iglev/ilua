@@ -131,7 +131,7 @@ func NewStateWithOpts(do *Options) *LState {
 	L.openlibs()
 	// hotfix
 	if L.opts.NeedHotfix {
-		L.hfMgr = newHotfixMgr(ctx, L.opts.NeedHotfixCoro)
+		L.hfMgr = newHotfixMgr(ctx, L.opts.NeedHotfixCoro, L.opts.HotfixTime)
 	}
 	return L
 }

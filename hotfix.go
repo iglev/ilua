@@ -13,19 +13,21 @@ type hotfixMgr interface {
 	check(L *LState) *hotfixList
 }
 
-func newHotfixMgr(ctx context.Context, needCoro bool) hotfixMgr {
+func newHotfixMgr(ctx context.Context, needCoro bool, hotfixTime int64) hotfixMgr {
 	var ht hotfixMgr
 	if needCoro {
 		htco := &hotfixMgrCoro{
-			ctx: ctx,
-			ch:  make(chan *hotfixList, 16),
+			ctx:        ctx,
+			ch:         make(chan *hotfixList, 16),
+			hotfixTime: hotfixTime,
 		}
 		go htco.loop()
 		ht = htco
 	} else {
 		ht = &hotfixMgrLocal{
-			mp:       make(map[string]int64),
-			lasttime: time.Now().Unix(),
+			mp:         make(map[string]int64),
+			lasttime:   time.Now().Unix(),
+			hotfixTime: hotfixTime,
 		}
 	}
 	return ht
@@ -51,8 +53,9 @@ func hotfixDoFile(L *LState, ht hotfixMgr, up *hotfixList) {
 // hotfixMgrLocal
 
 type hotfixMgrLocal struct {
-	mp       map[string]int64
-	lasttime int64
+	mp         map[string]int64
+	lasttime   int64
+	hotfixTime int64
 }
 
 func (ht *hotfixMgrLocal) reg(file string) {
@@ -65,7 +68,7 @@ func (ht *hotfixMgrLocal) reg(file string) {
 
 func (ht *hotfixMgrLocal) check(L *LState) *hotfixList {
 	curr := time.Now().Unix()
-	if curr < (ht.lasttime + DefaultHotfix) {
+	if curr < (ht.lasttime + ht.hotfixTime) {
 		return nil
 	}
 	ht.lasttime = curr
@@ -106,9 +109,10 @@ func (ht *hotfixMgrLocal) getHotfixList() *hotfixList {
 // hotfixMgrCoro
 
 type hotfixMgrCoro struct {
-	ctx context.Context
-	mp  sync.Map
-	ch  chan *hotfixList
+	ctx        context.Context
+	mp         sync.Map
+	ch         chan *hotfixList
+	hotfixTime int64
 }
 
 func (ht *hotfixMgrCoro) reg(file string) {
@@ -137,14 +141,14 @@ func (ht *hotfixMgrCoro) getHotfixList() *hotfixList {
 }
 
 func (ht *hotfixMgrCoro) loop() {
-	timer := time.NewTimer(DefaultHotfix * time.Second)
+	timer := time.NewTimer(time.Duration(ht.hotfixTime) * time.Second)
 	defer timer.Stop()
 Loop:
 	for {
 		select {
 		case <-timer.C:
 			ht.loopCheck()
-			timer.Reset(DefaultHotfix * time.Second)
+			timer.Reset(time.Duration(ht.hotfixTime) * time.Second)
 		case <-ht.ctx.Done():
 			break Loop
 		}
