@@ -19,7 +19,7 @@ func newHotfixMgr(ctx context.Context, needCoro bool, hotfixTime int64) hotfixMg
 	if needCoro {
 		htco := &hotfixMgrCoro{
 			ctx:        ctx,
-			ch:         make(chan *hotfixList, 16),
+			ch:         make(chan *hotfixList, 20480),
 			hotfixTime: hotfixTime,
 		}
 		go htco.loop()
