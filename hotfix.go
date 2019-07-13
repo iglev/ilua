@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 	"time"
+	"sync/atomic"
 
 	log "github.com/iglev/ilog"
 )
@@ -68,10 +69,11 @@ func (ht *hotfixMgrLocal) reg(file string) {
 
 func (ht *hotfixMgrLocal) check(L *LState) *hotfixList {
 	curr := time.Now().Unix()
-	if curr < (ht.lasttime + ht.hotfixTime) {
+	lasttime := atomic.LoadInt64(&ht.lasttime)
+	if curr < (lasttime + ht.hotfixTime) {
 		return nil
 	}
-	ht.lasttime = curr
+	atomic.StoreInt64(&ht.lasttime, curr)
 	up := ht.getHotfixList()
 	if up != nil {
 		hotfixDoFile(L, ht, up)
