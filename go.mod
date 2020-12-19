@@ -1,5 +1,7 @@
 module github.com/iglev/ilua
 
+go 1.15
+
 require (
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/iglev/ilog v1.0.0
